@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
+import java.util.logging.Level;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
@@ -340,6 +341,13 @@ public class TileEntityStargateBase extends TileEntityChunkLoader implements IIn
 	void enterState(EnumStargateState newState, int newTimeout) {
 		// System.out.printf("SGBaseTE: %s entering state %s with timeout %s\n",
 		// side(), newState, newTimeout);
+		if (worldObj == null) {
+			SGCraft.getLogger().log(Level.WARNING, "Stargate attempted to change to state " + newState + ", but the world is undefined. Resetting!!");
+			clearConnection();
+			return;
+		}
+			
+			
 		state = newState;
 		timeout = newTimeout;
 		// System.out.println("enterState " + isInitiator + " " + newState);
@@ -351,7 +359,7 @@ public class TileEntityStargateBase extends TileEntityChunkLoader implements IIn
 				powerLevel = 0;
 		} else if (state == EnumStargateState.Disconnecting || state == EnumStargateState.Idle)
 			powerLevel = 0;
-		worldObj.notifyBlockChange(xCoord, yCoord, zCoord, blockType.blockID);
+		worldObj.notifyBlockChange(xCoord, yCoord, zCoord, worldObj.getBlockId(xCoord, yCoord, zCoord));
 		onInventoryChanged();
 		markBlockForUpdate();
 
